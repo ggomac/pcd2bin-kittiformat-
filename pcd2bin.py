@@ -12,19 +12,31 @@ def main():
         "--pcd_path",
         help=".pcd file path.",
         type=str,
-        default="/home/s/pcd2bin/gnictpcdfile"
+        default="/home/user/pcdfile"
     )
     parser.add_argument(
         "--ascii_path",
         help=".ascii pcd file path.",
         type=str,
-        default="/home/s/pcd2bin/ascii_pcd"
+        default="/home/user/ascii_pcd"
     )
     parser.add_argument(
         "--bin_path",
         help=".bin file path.",
         type=str,
-        default="/home/s/pcd2bin/binfile"
+        default="/home/user/binfile"
+    )
+    parser.add_argument(
+        "--ascii_file_name",
+        help=".file name.",
+        type=str,
+        default="ascii"
+    )
+    parser.add_argument(
+        "--file_name",
+        help=".file name.",
+        type=str,
+        default="---"
     )
     args = parser.parse_args()
     
@@ -74,12 +86,12 @@ def main():
     for pcd_file in tqdm(pcd_files):
         pc = pypcd.PointCloud.from_path(pcd_file)
         ## binary_pcd -> ascii_pcd
-        ascii_file_name="{:06d}.pcd".format(seq)
+        ascii_file_name="{}_{:06d}.pcd".format(args.ascii_file_name, seq)
         pc.save_pcd(ascii_file_name, compression='ascii')
         
         pc = pypcd.PointCloud.from_path(ascii_file_name)
         ## Generate bin file name
-        bin_file_name = "{:06d}.bin".format(seq)
+        bin_file_name = "{}_{:06d}.bin".format(args.file_name, seq)
         bin_file_path = os.path.join(args.bin_path, bin_file_name)
         
         ## Get data from pcd (x, y, z, intensity, ring, time)
@@ -101,8 +113,8 @@ def main():
             [os.path.split(pcd_file)[-1], bin_file_name]
         )
 
-        os.remove(ascii_file_name)
-        ##shutil.move(ascii_file_name, args.ascii_path +'/'+ ascii_file_name)
+        ##os.remove(ascii_file_name)
+        shutil.move(ascii_file_name, args.ascii_path +'/'+ ascii_file_name)
         seq = seq+1
         
 if __name__ == "__main__":
